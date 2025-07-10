@@ -3,7 +3,7 @@ AST-based parser for multiline strings.
 """
 import ast
 from typing import List, Optional
-from ...domain.entities.multiline_string import (
+from domain.entities.multiline_string import (
     MultilineString, QuoteType, StringContext, Position, SourceLocation
 )
 

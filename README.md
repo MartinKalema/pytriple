@@ -5,7 +5,7 @@ A Python tool for automatically fixing triple-quoted string indentation while pr
 ## Features
 
 - **Automatic Detection**: Uses AST parsing to accurately detect multiline strings
-- **Preserves Structure**: Maintains relative indentation within strings (SQL, JSON, HTML, YAML, etc.)
+- **Preserves Relative Indentation**: Maintains the relative indentation structure within strings, ensuring that the hierarchical structure of SQL, JSON, HTML, YAML, etc. is preserved exactly as the developer intended
 - **Clean Architecture**: Built with Domain-Driven Design principles
 - **Backup Support**: Creates backups before modifying files (default behavior)
 - **CLI Interface**: User-friendly command line interface
@@ -39,6 +39,7 @@ pytriple check example.py
 #### fix-file
 - `--no-backup`: Skip creating backup files
 - `--dry-run`: Preview changes without modifying files
+- `--verbose`, `-v`: Show detailed information about changes
 
 #### fix-directory
 - `--no-backup`: Skip creating backup files
@@ -87,10 +88,16 @@ class DatabaseManager:
 
 pytriple analyzes Python files using AST (Abstract Syntax Tree) parsing to find triple-quoted strings. It then:
 
-1. Identifies strings with inconsistent indentation
+1. Identifies strings where the base indentation doesn't match Python conventions
 2. Calculates the minimum indentation level of content lines
-3. Adjusts the base indentation while preserving relative indentation
-4. Writes the corrected content back to the file
+3. Adjusts only the base indentation to match the code context (parent indentation + 4 spaces)
+4. **Preserves all relative indentation** within the string content
+5. Writes the corrected content back to the file
+
+This approach ensures that:
+- Python code follows consistent indentation practices
+- The internal structure of SQL queries, JSON data, HTML templates, YAML configs, etc. remains exactly as intended
+- Complex hierarchical content maintains its readability and structure
 
 ## Development
 

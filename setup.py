@@ -35,7 +35,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "pytriple=presentation.cli.cli:cli",
+            "pytriple=main:main",
         ],
     },
 )

@@ -1,9 +1,11 @@
 """Application layer for multiline string indentation fixer."""
 
 from .use_cases import (
-    FixFileIndentationUseCase, 
+    FixFileIndentationUseCase,
+    FixDirectoryIndentationUseCase
+)
+from .dtos import (
     FixFileResult,
-    FixDirectoryIndentationUseCase, 
     FixDirectoryResult
 )
 

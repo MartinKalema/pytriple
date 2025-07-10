@@ -6,8 +6,8 @@ from dependency_injector import containers, providers
 from .config import default_config
 from .parsers.ast_parser import ASTParser
 from .file_system.file_system_repository import FileSystemRepository
-from ..application.use_cases.fix_file_indentation import FixFileIndentationUseCase
-from ..application.use_cases.fix_directory_indentation import FixDirectoryIndentationUseCase
+from application.use_cases.fix_file_indentation import FixFileIndentationUseCase
+from application.use_cases.fix_directory_indentation import FixDirectoryIndentationUseCase
 
 
 class Container(containers.DeclarativeContainer):

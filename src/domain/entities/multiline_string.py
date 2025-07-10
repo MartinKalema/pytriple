@@ -19,6 +19,16 @@ class StringContext(Enum):
     RETURN_STATEMENT = "return"
     FUNCTION_CALL = "function_call"
     DOCSTRING = "docstring"
+    
+    def get_description(self) -> str:
+        """Get user-friendly description of the context."""
+        descriptions = {
+            self.ASSIGNMENT: "variable assignment",
+            self.RETURN_STATEMENT: "return statement",
+            self.FUNCTION_CALL: "function argument",
+            self.DOCSTRING: "docstring"
+        }
+        return descriptions.get(self, self.value)
 
 @dataclass(frozen=True)
 class Position:
@@ -62,19 +72,20 @@ class MultilineString:
         if len(lines) <= 2:  # Only opening/closing lines
             return False
         
-        # Check if content lines have inconsistent indentation
+        # Check if content lines have proper base indentation
         content_lines = [line for line in lines[1:-1] if line.strip()]
         if not content_lines:
             return False
         
-        # Check if indentation is consistent with expected base + 4 spaces
-        expected_indent = self.base_indentation + 4
+        # Find the minimum indentation of non-empty content lines
+        min_indent = float('inf')
         for line in content_lines:
             actual_indent = len(line) - len(line.lstrip())
-            if actual_indent != expected_indent:
-                return True
+            min_indent = min(min_indent, actual_indent)
         
-        return False
+        # Check if the minimum indentation matches expected base + 4 spaces
+        expected_min_indent = self.base_indentation + 4
+        return min_indent != expected_min_indent
     
     def get_fixed_content(self) -> str:
         """Generate properly indented content."""

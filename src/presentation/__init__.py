@@ -1,5 +1,3 @@
 """Presentation layer for multiline string indentation fixer."""
 
-from .cli import cli
-
-__all__ = ['cli']
+# This module contains the CLI interface

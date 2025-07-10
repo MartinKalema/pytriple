@@ -4,8 +4,8 @@ File system implementation of file repository.
 import os
 from pathlib import Path
 from typing import List, Optional
-from ...domain.entities.source_file import SourceFile
-from ...domain.repositories.parser_repository import ParserRepository
+from domain.entities.source_file import SourceFile
+from domain.repositories.parser_repository import ParserRepository
 
 class FileSystemRepository:
     """File system implementation of file repository."""
