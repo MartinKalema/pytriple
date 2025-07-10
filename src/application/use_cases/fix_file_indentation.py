@@ -6,6 +6,7 @@ from typing import Optional, List
 from domain.repositories.file_repository import FileRepository
 from domain.repositories.parser_repository import ParserRepository
 from domain.entities.source_file import SourceFile
+from domain.exceptions import FileReadException, FileWriteException, ParsingException
 from application.dtos.fix_file_result import FixFileResult
 
 class FixFileIndentationUseCase:
@@ -28,13 +29,21 @@ class FixFileIndentationUseCase:
         """
         try:
             # Read the file
-            source_file = self.file_repo.read_file(file_path)
-            if not source_file:
+            try:
+                source_file = self.file_repo.read_file(file_path)
+                if not source_file:
+                    return FixFileResult(
+                        file_path=file_path,
+                        was_modified=False,
+                        backup_created=False,
+                        error=f"Could not read file: {file_path}"
+                    )
+            except FileReadException as e:
                 return FixFileResult(
                     file_path=file_path,
                     was_modified=False,
                     backup_created=False,
-                    error=f"Could not read file: {file_path}"
+                    error=str(e)
                 )
             
             # Check if file needs fixing
@@ -49,7 +58,15 @@ class FixFileIndentationUseCase:
             # Create backup if requested
             backup_created = False
             if create_backup:
-                backup_created = self.file_repo.create_backup(source_file)
+                try:
+                    backup_created = self.file_repo.create_backup(source_file)
+                except FileWriteException as e:
+                    return FixFileResult(
+                        file_path=file_path,
+                        was_modified=False,
+                        backup_created=False,
+                        error=f"Failed to create backup: {str(e)}"
+                    )
             
             # Get fixed content
             fixed_content = source_file.get_fixed_content()
@@ -71,13 +88,21 @@ class FixFileIndentationUseCase:
             )
             
             # Write the fixed file
-            write_success = self.file_repo.write_file(updated_source_file)
-            if not write_success:
+            try:
+                write_success = self.file_repo.write_file(updated_source_file)
+                if not write_success:
+                    return FixFileResult(
+                        file_path=file_path,
+                        was_modified=False,
+                        backup_created=backup_created,
+                        error="Could not write fixed file"
+                    )
+            except FileWriteException as e:
                 return FixFileResult(
                     file_path=file_path,
                     was_modified=False,
                     backup_created=backup_created,
-                    error="Could not write fixed file"
+                    error=str(e)
                 )
             
             return FixFileResult(
@@ -87,6 +112,13 @@ class FixFileIndentationUseCase:
                 strings_fixed=len(source_file.fixable_strings)
             )
             
+        except ParsingException as e:
+            return FixFileResult(
+                file_path=file_path,
+                was_modified=False,
+                backup_created=False,
+                error=f"Parse error: {str(e)}"
+            )
         except Exception as e:
             return FixFileResult(
                 file_path=file_path,

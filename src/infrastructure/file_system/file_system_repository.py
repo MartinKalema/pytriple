@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import List, Optional
 from domain.entities.source_file import SourceFile
 from domain.repositories.parser_repository import ParserRepository
+from domain.exceptions import FileReadException, FileWriteException
 
 class FileSystemRepository:
     """File system implementation of file repository."""
@@ -15,30 +16,38 @@ class FileSystemRepository:
     
     def read_file(self, path: Path) -> Optional[SourceFile]:
         """Read a Python source file."""
+        if not path.exists() or not path.is_file():
+            return None
+        
+        if path.suffix != '.py':
+            return None
+        
         try:
-            if not path.exists() or not path.is_file():
-                return None
-            
-            if path.suffix != '.py':
-                return None
-            
             with open(path, 'r', encoding='utf-8') as f:
                 content = f.read()
-            
-            # Parse multiline strings (empty files will have no strings)
-            multiline_strings = []
-            if content.strip():  # Only parse non-empty files
-                multiline_strings = self.parser_repo.parse_multiline_strings(content)
-            
-            return SourceFile(
-                path=path,
-                content=content,
-                multiline_strings=multiline_strings
-            )
-            
+        except FileNotFoundError:
+            raise FileReadException(f"File not found: {path}")
+        except PermissionError:
+            raise FileReadException(f"Permission denied reading file: {path}")
+        except UnicodeDecodeError:
+            raise FileReadException(f"File is not valid UTF-8: {path}")
         except Exception as e:
-            print(f"Error reading file {path}: {e}")
-            return None
+            raise FileReadException(f"Error reading file {path}: {str(e)}")
+        
+        # Parse multiline strings (empty files will have no strings)
+        multiline_strings = []
+        if content.strip():  # Only parse non-empty files
+            try:
+                multiline_strings = self.parser_repo.parse_multiline_strings(content)
+            except Exception:
+                # Don't fail on parse errors - file might have syntax errors
+                pass
+        
+        return SourceFile(
+            path=path,
+            content=content,
+            multiline_strings=multiline_strings
+        )
     
     def write_file(self, source_file: SourceFile) -> bool:
         """Write a source file with fixed content."""
@@ -46,24 +55,31 @@ class FileSystemRepository:
             with open(source_file.path, 'w', encoding='utf-8') as f:
                 f.write(source_file.content)
             return True
-            
+        except PermissionError:
+            raise FileWriteException(f"Permission denied writing file: {source_file.path}")
+        except OSError as e:
+            if e.errno == 28:  # No space left on device
+                raise FileWriteException(f"No space left on device: {source_file.path}")
+            raise FileWriteException(f"OS error writing file {source_file.path}: {str(e)}")
         except Exception as e:
-            print(f"Error writing file {source_file.path}: {e}")
-            return False
+            raise FileWriteException(f"Error writing file {source_file.path}: {str(e)}")
     
     def create_backup(self, source_file: SourceFile) -> bool:
         """Create a backup of the source file."""
+        backup_path = source_file.create_backup_path()
+        
         try:
-            backup_path = source_file.create_backup_path()
-            
             with open(backup_path, 'w', encoding='utf-8') as f:
                 f.write(source_file.content)
-            
             return True
-            
+        except PermissionError:
+            raise FileWriteException(f"Permission denied creating backup: {backup_path}")
+        except OSError as e:
+            if e.errno == 28:  # No space left on device
+                raise FileWriteException(f"No space left on device for backup: {backup_path}")
+            raise FileWriteException(f"OS error creating backup {backup_path}: {str(e)}")
         except Exception as e:
-            print(f"Error creating backup for {source_file.path}: {e}")
-            return False
+            raise FileWriteException(f"Error creating backup {backup_path}: {str(e)}")
     
     def find_python_files(self, directory: Path) -> List[Path]:
         """Find all Python files in a directory."""

@@ -256,5 +256,10 @@ def check(ctx: CLIContext, file_path: Path):
         click.echo(click.style("✅ All multiline strings are properly indented", fg='green'))
 
 
-if __name__ == '__main__':
+def main():
+    """Main entry point for the CLI."""
     cli()
+
+
+if __name__ == '__main__':
+    main()

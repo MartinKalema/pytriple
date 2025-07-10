@@ -6,36 +6,37 @@ from typing import List, Optional
 from domain.entities.multiline_string import (
     MultilineString, QuoteType, StringContext, Position, SourceLocation
 )
+from domain.exceptions import ParsingException
 
 class ASTParser:
     """AST-based implementation of parser repository."""
     
     def parse_multiline_strings(self, content: str) -> List[MultilineString]:
         """Parse multiline strings from Python source code using AST."""
+        # Handle empty or whitespace-only content
+        if not content.strip():
+            return []
+        
         try:
-            # Handle empty or whitespace-only content
-            if not content.strip():
-                return []
-            
             tree = ast.parse(content)
-            multiline_strings = []
-            lines = content.splitlines()
-            
-            for node in ast.walk(tree):
-                if isinstance(node, ast.Constant) and isinstance(node.value, str):
-                    if '\n' in node.value:  # Only multiline strings
-                        multiline_string = self._create_multiline_string(
-                            node, lines
-                        )
-                        if multiline_string:
-                            multiline_strings.append(multiline_string)
-            
-            return multiline_strings
-            
         except SyntaxError as e:
-            raise ValueError(f"Invalid Python syntax: {e}")
+            raise ParsingException(f"Invalid Python syntax at line {e.lineno}: {e.msg}")
         except Exception as e:
-            raise ValueError(f"Error parsing content: {e}")
+            raise ParsingException(f"Error parsing content: {str(e)}")
+        
+        multiline_strings = []
+        lines = content.splitlines()
+        
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Constant) and isinstance(node.value, str):
+                if '\n' in node.value:  # Only multiline strings
+                    multiline_string = self._create_multiline_string(
+                        node, lines
+                    )
+                    if multiline_string:
+                        multiline_strings.append(multiline_string)
+        
+        return multiline_strings
     
     def validate_syntax(self, content: str) -> bool:
         """Validate that the content has valid Python syntax."""
@@ -46,6 +47,8 @@ class ASTParser:
             ast.parse(content)
             return True
         except SyntaxError:
+            return False
+        except Exception:
             return False
     
     def _create_multiline_string(self, node: ast.Constant, lines: List[str]) -> Optional[MultilineString]:
