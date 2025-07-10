@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import List
 from domain.repositories.file_repository import FileRepository
 from domain.repositories.parser_repository import ParserRepository
-from .fix_file_indentation import FixFileIndentationUseCase
+from application.use_cases.fix_file_indentation import FixFileIndentationUseCase
 from application.dtos.fix_file_result import FixFileResult
 from application.dtos.fix_directory_result import FixDirectoryResult
 

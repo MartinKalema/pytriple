@@ -4,8 +4,8 @@ Domain entity representing a Python source file.
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional
-from .multiline_string import MultilineString
-from ..exceptions import (
+from domain.entities.multiline_string import MultilineString
+from domain.exceptions import (
     InvalidFileTypeException
 )
 

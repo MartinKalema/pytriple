@@ -1,7 +1,7 @@
 """Result DTO for directory fixing operations."""
 from dataclasses import dataclass, field
 from typing import List
-from .fix_file_result import FixFileResult
+from application.dtos.fix_file_result import FixFileResult
 
 @dataclass
 class FixDirectoryResult:
