@@ -5,7 +5,7 @@ import click
 import sys
 from pathlib import Path
 from typing import List
-from infrastructure.container import Container
+from container import Container
 
 class CLIContext:
     """Context object for CLI commands."""
