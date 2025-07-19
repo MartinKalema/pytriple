@@ -11,15 +11,15 @@ if (!newVersion) {
   process.exit(1);
 }
 
-// Update pyproject.toml
-const pyprojectPath = path.join(process.cwd(), 'pyproject.toml');
-let pyprojectContent = fs.readFileSync(pyprojectPath, 'utf8');
+// Update setup.py
+const setupPath = path.join(process.cwd(), 'setup.py');
+let setupContent = fs.readFileSync(setupPath, 'utf8');
 
-// Update version in pyproject.toml
-pyprojectContent = pyprojectContent.replace(
-  /version = ".*"/,
-  `version = "${newVersion}"`
+// Update version in setup.py
+setupContent = setupContent.replace(
+  /version="[^"]*"/,
+  `version="${newVersion}"`
 );
 
-fs.writeFileSync(pyprojectPath, pyprojectContent);
-console.log(`Updated pyproject.toml to version ${newVersion}`);
+fs.writeFileSync(setupPath, setupContent);
+console.log(`Updated setup.py to version ${newVersion}`);
