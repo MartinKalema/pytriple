@@ -20,6 +20,12 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "MartinKalema"
+          git config --global user.email "kalemaaaaaaaa@gmail.com"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -40,4 +46,8 @@ jobs:
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIT_AUTHOR_NAME: MartinKalema
+          GIT_AUTHOR_EMAIL: kalemaaaaaaaa@gmail.com
+          GIT_COMMITTER_NAME: MartinKalema
+          GIT_COMMITTER_EMAIL: kalemaaaaaaaa@gmail.com
         run: npx semantic-release
