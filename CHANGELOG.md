@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/MartinKalema/pytriple/compare/v1.0.0...v1.0.1) (2025-07-19)
+
+### 🐛 Bug Fixes
+
+* configure release workflow to use author identity instead of bot ([bf8cb14](https://github.com/MartinKalema/pytriple/commit/bf8cb1460adc503ad19ffa1d5aa0b54a5eaddd72))
+* use GitHub secrets for git identity in release workflow ([d76cfd1](https://github.com/MartinKalema/pytriple/commit/d76cfd14f8dc141524958493ce8e7db24f1afab2))
+
 ## 1.0.0 (2025-07-19)
 
 ### 🚀 Features

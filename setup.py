@@ -7,7 +7,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="pytriple",
-    version="1.0.0",
+    version="1.0.1",
     author="Martin Kalema",
     description="Python tool for fixing triple-quoted string indentation",
     long_description=long_description,
