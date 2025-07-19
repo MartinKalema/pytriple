@@ -13,6 +13,12 @@ class FixDirectoryIndentationUseCase:
     """Use case for fixing multiline string indentation in all Python files in a directory."""
     
     def __init__(self, file_repo: FileRepository, parser_repo: ParserRepository):
+        """Initialize the use case with required repositories.
+        
+        Args:
+            file_repo: Repository for file operations.
+            parser_repo: Repository for parsing operations.
+        """
         self.file_repo = file_repo
         self.parser_repo = parser_repo
         self.fix_file_use_case = FixFileIndentationUseCase(file_repo, parser_repo)

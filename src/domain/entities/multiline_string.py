@@ -21,7 +21,11 @@ class StringContext(Enum):
     DOCSTRING = "docstring"
     
     def get_description(self) -> str:
-        """Get user-friendly description of the context."""
+        """Get user-friendly description of the context.
+        
+        Returns:
+            str: Human-readable description of the string context.
+        """
         descriptions = {
             self.ASSIGNMENT: "variable assignment",
             self.RETURN_STATEMENT: "return statement",
@@ -55,6 +59,13 @@ class MultilineString:
     original_lines: List[str]
     
     def __post_init__(self):
+        """Validate multiline string after initialization.
+        
+        Raises:
+            EmptyStringContentException: If content is empty.
+            InvalidIndentationException: If base indentation is negative.
+            NotMultilineStringException: If content is not multiline.
+        """
         if not self.content:
             raise EmptyStringContentException()
         if self.base_indentation < 0:
@@ -64,7 +75,11 @@ class MultilineString:
     
     @property
     def needs_fixing(self) -> bool:
-        """Check if this string needs indentation fixing."""
+        """Check if this string needs indentation fixing.
+        
+        Returns:
+            bool: True if the string's indentation doesn't match expected format.
+        """
         if self.context == StringContext.DOCSTRING:
             return False
         
@@ -88,7 +103,11 @@ class MultilineString:
         return min_indent != expected_min_indent
     
     def get_fixed_content(self) -> str:
-        """Generate properly indented content."""
+        """Generate properly indented content.
+        
+        Returns:
+            str: The string content with corrected indentation.
+        """
         if not self.needs_fixing:
             return self.content
         
@@ -127,7 +146,11 @@ class MultilineString:
         return '\n'.join(fixed_lines)
     
     def get_full_replacement(self) -> str:
-        """Generate the full string replacement including quotes."""
+        """Generate the full string replacement including quotes.
+        
+        Returns:
+            str: Complete string with quotes and proper indentation.
+        """
         base_indent = ' ' * self.base_indentation
         fixed_content = self.get_fixed_content()
         

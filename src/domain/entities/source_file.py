@@ -19,13 +19,22 @@ class SourceFile:
     multiline_strings: List[MultilineString]
     
     def __post_init__(self):
+        """Validate source file after initialization.
+        
+        Raises:
+            InvalidFileTypeException: If file is not a Python file.
+        """
         if not self.path.suffix == '.py':
             raise InvalidFileTypeException(str(self.path))
         # Empty files are allowed - they will be skipped during processing
     
     @property
     def needs_fixing(self) -> bool:
-        """Check if this file contains multiline strings that need fixing."""
+        """Check if this file contains multiline strings that need fixing.
+        
+        Returns:
+            bool: True if any multiline strings need indentation correction.
+        """
         # Empty files don't need fixing
         if not self.content.strip():
             return False
@@ -33,11 +42,19 @@ class SourceFile:
     
     @property
     def fixable_strings(self) -> List[MultilineString]:
-        """Get all multiline strings that need fixing."""
+        """Get all multiline strings that need fixing.
+        
+        Returns:
+            List[MultilineString]: List of strings requiring indentation fixes.
+        """
         return [ms for ms in self.multiline_strings if ms.needs_fixing]
     
     def get_fixed_content(self) -> str:
-        """Generate the file content with fixed multiline string indentation."""
+        """Generate the file content with fixed multiline string indentation.
+        
+        Returns:
+            str: The complete file content with corrected string indentation.
+        """
         if not self.needs_fixing:
             return self.content
         
@@ -89,5 +106,9 @@ class SourceFile:
         return ''.join(lines)
     
     def create_backup_path(self) -> Path:
-        """Create a backup file path."""
+        """Create a backup file path.
+        
+        Returns:
+            Path: Path for the backup file with .backup extension.
+        """
         return self.path.with_suffix(f"{self.path.suffix}.backup")

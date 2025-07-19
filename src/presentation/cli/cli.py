@@ -11,14 +11,12 @@ class CLIContext:
     """Context object for CLI commands."""
     
     def __init__(self):
+        """Initialize CLI context with dependency injection container."""
         self.container = Container()
         self.container.wire(modules=[__name__])
         
-        # Get use cases from container
         self.fix_file_use_case = self.container.fix_file_use_case()
         self.fix_directory_use_case = self.container.fix_directory_use_case()
-        
-        # Access repositories if needed
         self.file_repo = self.container.file_repository()
         self.parser_repo = self.container.parser_repository()
 
@@ -36,10 +34,10 @@ def cli(ctx):
     HTML templates, YAML configs, etc. remains exactly as the developer intended.
     
     Examples:
-      pytriple check script.py              # Check if a file needs fixing
-      pytriple fix-file script.py           # Fix a single file
-      pytriple fix-directory src/           # Fix all Python files in a directory
-      pytriple fix-file --dry-run file.py  # Preview changes without modifying
+      pytriple check script.py
+      pytriple fix-file script.py
+      pytriple fix-directory src/
+      pytriple fix-file --dry-run file.py
     """
     ctx.ensure_object(CLIContext)
 
@@ -100,7 +98,6 @@ def fix_file(ctx: CLIContext, file_path: Path, backup: bool, dry_run: bool, verb
             source_file = ctx.file_repo.read_file(file_path)
             if source_file:
                 click.echo("Fixed strings at:")
-                # Read the original file to show what was fixed
                 original_content = None
                 if result.backup_created:
                     backup_path = file_path.with_suffix(f"{file_path.suffix}.backup")
@@ -111,7 +108,6 @@ def fix_file(ctx: CLIContext, file_path: Path, backup: bool, dry_run: bool, verb
                         pass
                 
                 if original_content:
-                    # Parse original to show what was fixed
                     original_strings = ctx.parser_repo.parse_multiline_strings(original_content)
                     for i, ms in enumerate([s for s in original_strings if s.needs_fixing], 1):
                         click.echo(f"  - Lines {ms.location.start.line}-{ms.location.end.line}: {ms.context.get_description()}")
@@ -148,10 +144,7 @@ def fix_directory(ctx: CLIContext, directory_path: Path, backup: bool,
     if dry_run:
         click.echo(click.style(f"[DRY RUN] Checking directory: {directory_path}", fg='yellow'))
         
-        # Get Python files
         python_files = ctx.file_repo.find_python_files(directory_path)
-        
-        # Apply exclude patterns
         exclude_patterns = list(exclude) if exclude else ['test_*', '*_test.py', 'fix_*.py']
         filtered_files = [
             f for f in python_files
@@ -187,7 +180,6 @@ def fix_directory(ctx: CLIContext, directory_path: Path, backup: bool,
     
     click.echo(f"Processing directory: {directory_path}")
     
-    # Convert exclude patterns
     exclude_patterns = list(exclude) if exclude else ['test_*', '*_test.py', 'fix_*.py']
     
     if exclude_patterns:
@@ -208,7 +200,6 @@ def fix_directory(ctx: CLIContext, directory_path: Path, backup: bool,
             if file_result.was_modified:
                 click.echo(f"    Fixed {file_result.strings_fixed} strings")
     
-    # Summary
     click.echo(f"\n📊 Summary:")
     click.echo(f"  Files processed: {result.files_processed}")
     click.echo(f"  Files modified: {result.files_modified}")
@@ -251,13 +242,13 @@ def check(ctx: CLIContext, file_path: Path):
         for i, ms in enumerate(fixable_strings, 1):
             click.echo(f"  {i}. Lines {ms.location.start.line}-{ms.location.end.line}: {ms.context.get_description()}")
         
-        sys.exit(1)  # Exit with error code if fixes are needed
+        sys.exit(1)
     else:
         click.echo(click.style("✅ All multiline strings are properly indented", fg='green'))
 
 
 def main():
-    """Main entry point for the CLI."""
+    """Main entry point for the CLI application."""
     cli()
 
 

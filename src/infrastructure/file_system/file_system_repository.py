@@ -12,10 +12,25 @@ class FileSystemRepository:
     """File system implementation of file repository."""
     
     def __init__(self, parser_repo: ParserRepository):
+        """Initialize repository with parser dependency.
+        
+        Args:
+            parser_repo: Parser repository for parsing operations.
+        """
         self.parser_repo = parser_repo
     
     def read_file(self, path: Path) -> Optional[SourceFile]:
-        """Read a Python source file."""
+        """Read a Python source file.
+        
+        Args:
+            path: Path to the Python file to read.
+            
+        Returns:
+            Optional[SourceFile]: Parsed source file or None if file cannot be read.
+            
+        Raises:
+            FileReadException: If file cannot be read due to IO errors.
+        """
         if not path.exists() or not path.is_file():
             return None
         
@@ -50,7 +65,17 @@ class FileSystemRepository:
         )
     
     def write_file(self, source_file: SourceFile) -> bool:
-        """Write a source file with fixed content."""
+        """Write a source file with fixed content.
+        
+        Args:
+            source_file: SourceFile entity with content to write.
+            
+        Returns:
+            bool: True if write was successful.
+            
+        Raises:
+            FileWriteException: If file cannot be written due to IO errors.
+        """
         try:
             with open(source_file.path, 'w', encoding='utf-8') as f:
                 f.write(source_file.content)
@@ -65,7 +90,17 @@ class FileSystemRepository:
             raise FileWriteException(f"Error writing file {source_file.path}: {str(e)}")
     
     def create_backup(self, source_file: SourceFile) -> bool:
-        """Create a backup of the source file."""
+        """Create a backup of the source file.
+        
+        Args:
+            source_file: SourceFile entity to backup.
+            
+        Returns:
+            bool: True if backup was created successfully.
+            
+        Raises:
+            FileWriteException: If backup cannot be created due to IO errors.
+        """
         backup_path = source_file.create_backup_path()
         
         try:
@@ -82,7 +117,14 @@ class FileSystemRepository:
             raise FileWriteException(f"Error creating backup {backup_path}: {str(e)}")
     
     def find_python_files(self, directory: Path) -> List[Path]:
-        """Find all Python files in a directory."""
+        """Find all Python files in a directory.
+        
+        Args:
+            directory: Root directory to search for Python files.
+            
+        Returns:
+            List[Path]: List of paths to all Python files found.
+        """
         python_files = []
         
         try:
@@ -101,5 +143,12 @@ class FileSystemRepository:
             return []
     
     def file_exists(self, path: Path) -> bool:
-        """Check if a file exists."""
+        """Check if a file exists.
+        
+        Args:
+            path: Path to check for existence.
+            
+        Returns:
+            bool: True if file exists, False otherwise.
+        """
         return path.exists() and path.is_file()

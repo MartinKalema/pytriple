@@ -12,7 +12,17 @@ class ASTParser:
     """AST-based implementation of parser repository."""
     
     def parse_multiline_strings(self, content: str) -> List[MultilineString]:
-        """Parse multiline strings from Python source code using AST."""
+        """Parse multiline strings from Python source code using AST.
+        
+        Args:
+            content: Python source code content to parse.
+            
+        Returns:
+            List[MultilineString]: List of multiline strings found in the code.
+            
+        Raises:
+            ParsingException: If the content has invalid Python syntax.
+        """
         # Handle empty or whitespace-only content
         if not content.strip():
             return []
@@ -39,7 +49,14 @@ class ASTParser:
         return multiline_strings
     
     def validate_syntax(self, content: str) -> bool:
-        """Validate that the content has valid Python syntax."""
+        """Validate that the content has valid Python syntax.
+        
+        Args:
+            content: Python source code to validate.
+            
+        Returns:
+            bool: True if syntax is valid, False otherwise.
+        """
         try:
             # Empty files are valid Python
             if not content.strip():
@@ -52,7 +69,15 @@ class ASTParser:
             return False
     
     def _create_multiline_string(self, node: ast.Constant, lines: List[str]) -> Optional[MultilineString]:
-        """Create a MultilineString entity from an AST node."""
+        """Create a MultilineString entity from an AST node.
+        
+        Args:
+            node: AST Constant node containing a string.
+            lines: Source code lines for context extraction.
+            
+        Returns:
+            Optional[MultilineString]: MultilineString entity or None if creation fails.
+        """
         try:
             # Get source location
             start_line = node.lineno
@@ -99,7 +124,14 @@ class ASTParser:
             return None
     
     def _determine_quote_type(self, line: str) -> Optional[QuoteType]:
-        """Determine the quote type used in the line."""
+        """Determine the quote type used in the line.
+        
+        Args:
+            line: Source code line containing the string.
+            
+        Returns:
+            Optional[QuoteType]: Quote type enum or None if not found.
+        """
         if '"""' in line:
             return QuoteType.TRIPLE_DOUBLE
         elif "'''" in line:
@@ -107,7 +139,14 @@ class ASTParser:
         return None
     
     def _determine_context(self, line: str) -> StringContext:
-        """Determine the context of the string (assignment, return, etc.)."""
+        """Determine the context of the string (assignment, return, etc.).
+        
+        Args:
+            line: Source code line containing the string.
+            
+        Returns:
+            StringContext: Context enum for the string usage.
+        """
         stripped = line.strip()
         
         if stripped.startswith('"""') or stripped.startswith("'''"):
